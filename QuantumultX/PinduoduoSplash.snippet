@@ -1,0 +1,7 @@
+# 拼多多 IP 开屏素材拦截补充（Quantumult X 原生重写）
+# 与原 Loon 条件相同：URL 匹配且 User-Agent 包含拼多多标识才拦截。
+# 添加到重写引用；无需资源解析器。保留原页面净化插件。
+# 原 QUIC 条件不在本文件转换；用户当前配置已有 udp_drop_list = 443, STUN, QUIC。
+
+^http:\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/d(\d)? (?i)\r\nUser-Agent:[^\r\n]*com\.xunmeng\.pinduoduo url-and-header reject
+^http:\/\/\[[0-9a-fA-F:]+\]\/d(\d)?\? (?i)\r\nUser-Agent:[^\r\n]*com\.xunmeng\.pinduoduo url-and-header reject

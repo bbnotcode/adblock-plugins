@@ -1,0 +1,8 @@
+#!name=拼多多底栏精简
+#!desc=仅保留首页、聊天、个人中心。需要 Quantumult X build 845 或更新版本及 HTTPS 解密。无需资源解析器。
+# 同时处理 bottom_tabs 和 buffer_bottom_tabs；字段缺失或不是数组时保持原响应。
+# 请勿同时启用其他修改同一 homepage/hub 响应的拼多多规则。
+
+^https:\/\/api\.pinduoduo\.com\/api\/alexa\/homepage\/hub(?:\?|$) url jsonjq-response-body 'if (.result.bottom_tabs | type) == "array" then .result.bottom_tabs |= map(select(.link == "index.html" or .link == "chat_list.html" or .link == "personal.html")) else . end | if (.result.buffer_bottom_tabs | type) == "array" then .result.buffer_bottom_tabs |= map(select(.link == "index.html" or .link == "chat_list.html" or .link == "personal.html")) else . end'
+
+hostname = api.pinduoduo.com
