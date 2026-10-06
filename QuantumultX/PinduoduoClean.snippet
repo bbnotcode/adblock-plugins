@@ -1,9 +1,8 @@
-# ! 拼多多底栏与横幅净化（Quantumult X 原生）
-#!name=拼多多底栏与横幅净化
-#!desc=保留首页、聊天、个人中心；移除已知首页活动横幅及个人中心横幅。需要 build 845+ 和 HTTPS 解密；关闭资源解析器。
-# 不与其他修改 homepage/hub 或 philo/personal/hub 响应的拼多多规则同时启用。
+#!name=拼多多底栏与横幅净化 v2
+#!desc=响应脚本版；保留首页、聊天、个人中心，净化已知推广位。开启 HTTPS 解密，关闭资源解析器。不要与其他拼多多页面净化规则同时启用。
+# 字段参考 ZenmoFeiShi/Qx 与 Thelongdarkorg/loon-plugins。
+# 日志 [PDD Clean v2] 可判断是否命中与字段是否匹配，不记录用户数据。
 
-^https:\/\/api\.pinduoduo\.com\/api\/alexa\/homepage\/hub(?:\?|$) url jsonjq-response-body 'if (.result.bottom_tabs | type) == "array" then .result.bottom_tabs |= map(select(.link == "index.html" or .link == "chat_list.html" or .link == "personal.html")) else . end | if (.result.buffer_bottom_tabs | type) == "array" then .result.buffer_bottom_tabs |= map(select(.link == "index.html" or .link == "chat_list.html" or .link == "personal.html")) else . end | del(.result.dy_module.irregular_banner_dy)'
-^https:\/\/api\.pinduoduo\.com\/api\/philo\/personal\/hub(?:\?|$) url jsonjq-response-body 'del(.personal_banner)'
+^https?:\/\/api\.(pinduoduo|yangkeduo)\.com\/(?:api\/(?:alexa\/homepage\/hub|philo\/personal\/hub|oak\/integration\/render)(?:\/?(?:\?|$))|order\/) url script-response-body https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/Scripts/PinduoduoClean.js
 
-hostname = api.pinduoduo.com
+hostname = api.pinduoduo.com, api.yangkeduo.com
