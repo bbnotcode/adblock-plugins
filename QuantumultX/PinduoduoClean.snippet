@@ -1,8 +1,13 @@
-#!name=拼多多底栏与横幅净化 v2
+#!name=拼多多底栏与横幅净化 v3
 #!desc=响应脚本版；保留首页、聊天、个人中心，净化已知推广位。开启 HTTPS 解密，关闭资源解析器。不要与其他拼多多页面净化规则同时启用。
-# 字段参考 ZenmoFeiShi/Qx 与 Thelongdarkorg/loon-plugins。
-# 日志 [PDD Clean v2] 可判断是否命中与字段是否匹配，不记录用户数据。
+# 参考：ZenmoFeiShi、可莉署名的公开转换备份（2026-02-28）。
+# https://github.com/sooyaaabo/Egern/blob/main/Sgmodule/PinDuoDuo_remove_ads.sgmodule
+# 此为圈 X 改写，非可莉官方版本。
+# 日志 [PDD Clean v3] 可判断是否命中与字段是否匹配，不记录用户数据。
 
-^https?:\/\/api\.(pinduoduo|yangkeduo)\.com\/(?:api\/(?:alexa\/homepage\/hub|philo\/personal\/hub|oak\/integration\/render)(?:\/?(?:\?|$))|order\/) url script-response-body https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/Scripts/PinduoduoClean.js
+^https?:\/\/api\.(pinduoduo|yangkeduo)\.com\/(?:api\/(?:alexa\/homepage\/hub|philo\/personal\/hub|oak\/integration\/render)(?:\/?(?:\?|$))|order\/) url script-response-body https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/Scripts/PinduoduoCleanV3.js
+
+# 以下端点见可莉署名备份，以空 JSON 响应移除已知推广。
+^https?:\/\/api\.(pinduoduo|yangkeduo)\.com\/api\/(?:aquarius\/hungary\/global\/homepage|zaire_biz\/chat\/resource\/get_list_data|caterham\/v3\/query\/new_chat_group|growth\/nagato\/app\/index\/gather)(?:\/?(?:\?|$)) url reject-dict
 
 hostname = api.pinduoduo.com, api.yangkeduo.com
