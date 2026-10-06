@@ -1,51 +1,54 @@
-# 去广告插件
+# 拼多多页面净化（Quantumult X）
 
-个人使用的 Quantumult X 独立重写资源。现阶段收录拼多多底栏与横幅净化，不替换墨鱼配置、节点订阅、分流或证书。
+独立补充墨鱼配置，不替换主配置、订阅或证书。v1 用户反馈底栏未生效；v2 改用响应脚本，并加入命中日志。尚未在当前手机 App 上验证，不能保证有效。
 
-## 推荐：拼多多底栏与横幅净化
+## 直接引用
 
-直接引用：
+[底栏与横幅净化 v2](https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/QuantumultX/PinduoduoClean.snippet)
 
-https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/QuantumultX/PinduoduoClean.snippet
-
-在圈 X「重写 → 引用」中添加上面的地址，关闭该引用的资源解析器，开启重写与 HTTPS 解密。需要 Quantumult X build 845 或更新版本，证书应使用自己生成并已信任的证书。
+圈 X「重写 → 引用」添加，关闭本引用的资源解析器。开启重写、HTTPS 解密并信任自己的证书，确认解密列表包含 `api.pinduoduo.com`、`api.yangkeduo.com`。关闭其他修改同一拼多多接口响应的插件。
 
 ```ini
-https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/QuantumultX/PinduoduoClean.snippet, tag=拼多多底栏与横幅净化, update-interval=86400, opt-parser=false, enabled=true
+https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/QuantumultX/PinduoduoClean.snippet, tag=拼多多页面净化v2, update-interval=86400, opt-parser=false, enabled=true
 ```
 
-仅当对应接口仍返回这些字段时，规则才会有效：
+更新引用，并刷新脚本缓存（如果客户端提供该选项），然后强制退出拼多多再打开。
 
-| 位置 | 处理内容 |
+## 参照其他规则处理的内容
+
+| 位置 | 字段与处理 |
 | --- | --- |
-| 底部导航 | 过滤 `bottom_tabs` 与 `buffer_bottom_tabs`，仅保留 `index.html`、`chat_list.html`、`personal.html` 对应入口，即首页、聊天、个人中心。保留服务器返回的原有名称和顺序。 |
-| 首页 | 删除 `result.dy_module.irregular_banner_dy` 对应的活动/推广横幅。 |
-| 个人中心 | 删除 `personal_banner` 对应横幅。 |
+| 底栏 | `result.bottom_tabs` 和 `result.buffer_bottom_tabs`，保留首页、聊天、个人中心；未找到全部三个入口时保留原数组，避免空底栏。 |
+| 首页 | 删除 `icon_set`、`search_bar_hot_query`、`dy_module.irregular_banner_dy`、`dy_module.recommend_fresh_info`；删除 `all_top_opts` 内的推广图片尺寸字段。 |
+| 个人中心 | 删除 `monthly_card_entrance`、`personal_center_style_v2_vo`、`personal_banner`、`icon_set.icons`、`icon_set.top_personal_icons`。部分功能入口也会隐藏。 |
+| 商品页 | 删除 `bottom_section_list`、`ui.bottom_section`、`ui.live_section.float_info`。 |
+| 订单接口 | 删除 `marketing_banner_vo` 和 `shipping.banner_above_recommend`。 |
 
-不处理搜索结果广告、全部商品推荐、支付页、全部弹窗或内部 H5 页面。不存在的字段不会被创建。App 接口、字段和缓存变化可能使规则失效。
+仅处理已知字段，不按名字递归删除任意数据，不拦截支付或整个首页接口。App 可能使用缓存、其他接口或其他字段。
 
-### 避免重复
+## 如果还是完全没有变化
 
-墨鱼基础配置可以继续使用。不要同时启用其他修改 `api/alexa/homepage/hub` 或 `api/philo/personal/hub` 响应的拼多多净化规则。测试时可暂时关闭整份旧的拼多多页面净化插件，开屏规则可以单独保留。
+在圈 X 请求记录中找 `/api/alexa/homepage/hub`，并查看响应脚本日志：
 
-强制退出拼多多后重新打开，检查底栏、首页和个人中心；页面异常时关闭本引用再重开 App。
+- 没有 `[PDD Clean v2] homepage`：检查重写、证书信任、MITM 域名、规则冲突或是否仍使用缓存。只看到连接记录并不等于成功解密。
+- 有日志且 `tabs=0`：可能没有广告导航，或返回的导航字段/链接已变化，或缺少三个核心入口。
+- 日志显示删除了导航但界面不变：可能另有导航来源或 App 缓存。
+- `response not processed`：响应无法按 JSON 处理，保留原响应。
 
-## 可选资源
+日志不记录请求参数、正文或个人信息。需要进一步适配时，只提供脱敏的导航数组及日志；不要公开完整配置、Cookie、令牌或证书。
 
-不要同时启用「底栏与横幅净化」与「仅底栏精简」。
+## 可选连接规则
 
-| 文件 | 用途 | Raw 地址 |
-| --- | --- | --- |
-| `QuantumultX/PinduoduoBottomTabs.snippet` | 仅精简底栏，保留其他页面内容 | [直接链接](https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/QuantumultX/PinduoduoBottomTabs.snippet) |
-| `QuantumultX/PinduoduoSplash.snippet` | 两条 IP 开屏素材拦截补充；同时要求 URL 与拼多多 User-Agent 匹配 | [直接链接](https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/QuantumultX/PinduoduoSplash.snippet) |
+其他规则也拦截 `titan.pinduoduo.com`，但未确认它是 v1 失效原因。
 
-开屏补充不包含 QUIC 控制。它不需要资源解析器，不能代替页面净化。
+[可选分流引用](https://raw.githubusercontent.com/bbnotcode/adblock-plugins/main/Filters/PinduoduoTransport.list)：添加到「分流 → 引用」，关闭解析器。墨鱼或现有广告分流已拦截该域名时不要重复添加；连接异常时关闭此补充。
 
-## 来源与验证
+旧的 `PinduoduoBottomTabs.snippet` 为 v1 JQ 写法，不要与 v2 同时启用。`PinduoduoSplash.snippet` 是独立开屏补充，不处理页面底栏。
 
-- 接口与字段参考 [Thelongdarkorg/loon-plugins 的拼多多插件](https://github.com/Thelongdarkorg/loon-plugins/blob/main/pinduoduo_splash_ad_block.plugin)。本仓库将所需底栏、横幅处理整理为原生圈 X JQ 重写。
-- `url-and-header` 与 JQ 重写语法参考 [Quantumult X 官方示例](https://github.com/crossutility/Quantumult-X/blob/master/sample.conf)。
-- 已用模拟响应检查底栏过滤、横幅字段删除、无关数据保留及字段缺失情形；开屏条件已做 URL 与 User-Agent 匹配检查。
-- 尚未在手机上的当前拼多多版本验证效果，不保证所有广告都能去除。
+## 参考与验证
 
-仓库不包含个人代理配置、节点订阅、访问令牌或 MITM 证书。
+- [ZenmoFeiShi/Qx 原生圈 X 拼多多规则](https://github.com/ZenmoFeiShi/Qx/blob/main/Pinduoduo.snippet)，文件注明 2025-11-01、App 7.79.0。
+- [Thelongdarkorg/loon-plugins 拼多多规则](https://github.com/Thelongdarkorg/loon-plugins/blob/main/pinduoduo_splash_ad_block.plugin)，文件注明更新 2026-09-18。
+- [Quantumult X 官方配置示例](https://github.com/crossutility/Quantumult-X/blob/master/sample.conf)。
+
+参考接口和字段后独立实现响应脚本。已检查模拟底栏、推广位、无关数据保留、缺失字段、JSON 解析失败回退和 URL 匹配；模拟测试不代表当前手机 App 效果。
